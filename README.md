@@ -1,3 +1,13 @@
+# Proxmox VE 系統管理出租平台
+
+- 多PVE VM用戶組管理
+- 出租帳務核算
+- 客戶自己控制開關機/重啟等操作
+
+## 2025/2/4 新增項目
+- 初版框架設計
+- NavigationDrawer Class 製作必要選單 
+
 # my_app
 
 A new Flutter project.
