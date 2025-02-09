@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'views/register_form.dart';
+import 'views/user_profile.dart';
+import 'views/edit_profile.dart';
 
 void main() {
   runApp(const MyApp());
@@ -44,7 +47,18 @@ class _LoginPageState extends State<LoginPage> {
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),
       );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('請輸入帳號和密碼')),
+      );
     }
+  }
+
+  void _navigateToRegisterForm() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) =>  RegisterForm()),
+    );
   }
 
   @override
@@ -71,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Text(_isLogin ? '登入' : '註冊'),
             ),
             TextButton(
-              onPressed: _toggleAuthMode,
+              onPressed: _isLogin ? _navigateToRegisterForm : _toggleAuthMode,
               child: Text(_isLogin ? '沒有帳號？註冊' : '已經有帳號？登入'),
             ),
           ],
@@ -90,33 +104,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _selectedPage = "首頁";
-  bool _isDrawerPinned = false;
-  
+
   final Map<String, List<String>> menuItems = {
-    "系統管理": ["本人帳號", "他人帳號", "企業組織管理", "組織權限分配", "資產管理", "公告管理", "系統日誌"],
+    "系統管理": ["個人中心", "他人帳號", "企業組織管理", "組織權限分配", "資產管理", "公告管理", "系統日誌"],
     "工單管理": ["建立工單"],
     "虛擬機操作": ["虛擬機", "虛擬機操作", "可用資產管理"],
     "財務管理": ["月結帳單管理", "成本核算", "其他進項管理"]
   };
 
-  final Map<String, Widget> pages = {
-    "首頁": Center(child: Text("歡迎來到 Proxmox VE 管理平台", style: TextStyle(fontSize: 20))),
-    "本人帳號": Center(child: Text("這是本人帳號管理頁面", style: TextStyle(fontSize: 20))),
-    "他人帳號": Center(child: Text("這是他人帳號管理頁面", style: TextStyle(fontSize: 20))),
-    "企業組織管理": Center(child: Text("這是企業組織管理頁面", style: TextStyle(fontSize: 20))),
-    "組織權限分配": Center(child: Text("這是組織權限分配頁面", style: TextStyle(fontSize: 20))),
-    "資產管理": Center(child: Text("這是資產管理頁面", style: TextStyle(fontSize: 20))),
-    "公告管理": Center(child: Text("這是公告管理頁面", style: TextStyle(fontSize: 20))),
-    "系統日誌": Center(child: Text("這是系統日誌頁面", style: TextStyle(fontSize: 20))),
-    "建立工單": Center(child: Text("歡迎來到 Proxmox VE 管理平台", style: TextStyle(fontSize: 20))),
-    "虛擬機": Center(child: Text("這是本人帳號管理頁面", style: TextStyle(fontSize: 20))),
-    "虛擬機操作": Center(child: Text("這是他人帳號管理頁面", style: TextStyle(fontSize: 20))),
-    "可用資產管理": Center(child: Text("這是企業組織管理頁面", style: TextStyle(fontSize: 20))),
-    "月結帳單管理": Center(child: Text("這是組織權限分配頁面", style: TextStyle(fontSize: 20))),
-    "成本核算": Center(child: Text("這是資產管理頁面", style: TextStyle(fontSize: 20))),
-    "其他進項管理": Center(child: Text("這是公告管理頁面", style: TextStyle(fontSize: 20))),
-   
-  };
+  // 連結到個人中心頁面
+  Widget _getPageContent(String page) {
+     if (page == "個人中心") {
+      return UserProfile(userId: 'uuid',);
+    } 
+    return Center(child: Text('這是 $page 頁面', style: const TextStyle(fontSize: 20)));
+  }
 
   void _logout() {
     Navigator.pushReplacement(
@@ -167,7 +169,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: pages[_selectedPage] ?? const Center(child: Text("頁面未找到", style: TextStyle(fontSize: 20))),
+      body: _getPageContent(_selectedPage),
     );
   }
 }
