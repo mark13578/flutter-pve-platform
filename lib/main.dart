@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'views/register_form.dart';
 import 'views/user_profile.dart';
 import 'views/edit_profile.dart';
+import 'views/organization_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -116,7 +117,12 @@ class _HomePageState extends State<HomePage> {
   Widget _getPageContent(String page) {
      if (page == "個人中心") {
       return UserProfile(userId: 'uuid',);
-    } 
+    } else if (page == "企業組織管理") {
+      return MaterialApp(
+      title: '企業組織管理',
+      home: OrganizationView(),
+    );
+    }
     return Center(child: Text('這是 $page 頁面', style: const TextStyle(fontSize: 20)));
   }
 
