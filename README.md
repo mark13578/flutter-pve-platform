@@ -6,8 +6,11 @@
 
 ## 2025/2/4 新增項目
 - 初版框架設計
-- NavigationDrawer Class 製作必要選單 
+- NavigationDrawer Class 製作必要選單
 
+## 2025/2/9 新增項目
+- 基本註冊、個人中心前端
+  
 # my_app
 
 A new Flutter project.
