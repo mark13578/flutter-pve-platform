@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Proxmox VE 管理平台',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
@@ -105,6 +106,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _selectedPage = "首頁";
+  bool _isExpanded = false;
 
   final Map<String, List<String>> menuItems = {
     "系統管理": ["個人中心", "他人帳號", "企業組織管理", "組織權限分配", "資產管理", "公告管理", "系統日誌"],
@@ -136,46 +138,53 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_selectedPage)),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Colors.blue),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+      appBar: AppBar(
+        title: Text(_selectedPage),
+        leading: IconButton(
+          icon: Icon(_isExpanded ? Icons.arrow_back : Icons.arrow_forward),
+          onPressed: () {
+            setState(() {
+              _isExpanded = !_isExpanded;
+            });
+          },
+        ),
+      ),
+      body: Row(
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: _isExpanded ? 250 : 70,
+            curve: Curves.easeInOut,
+            child: Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
                 children: [
-                  const Text('Proxmox VE 管理平台', style: TextStyle(color: Colors.white, fontSize: 20)),
-                  const Spacer(),
-                  ElevatedButton(
-                    onPressed: _logout,
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                    child: const Text('登出', style: TextStyle(color: Colors.white)),
-                  ),
+                  for (var category in menuItems.keys) ...[
+                    ListTile(
+                      leading: Icon(Icons.category),
+                      title: _isExpanded ? Text(category, style: const TextStyle(fontWeight: FontWeight.bold)) : null,
+                    ),
+                    for (var item in menuItems[category]!)
+                      ListTile(
+                        leading: Icon(Icons.label),
+                        title: _isExpanded ? Text(item) : null,
+                        onTap: () {
+                          setState(() {
+                            _selectedPage = item;
+                          });
+                          Navigator.pop(context);
+                        },
+                      ),
+                  ]
                 ],
               ),
             ),
-            for (var category in menuItems.keys) ...[
-              ListTile(
-                title: Text(category, style: const TextStyle(fontWeight: FontWeight.bold)),
-              ),
-              for (var item in menuItems[category]!)
-                ListTile(
-                  title: Text(item),
-                  onTap: () {
-                    setState(() {
-                      _selectedPage = item;
-                    });
-                    Navigator.pop(context);
-                  },
-                ),
-            ]
-          ],
-        ),
+          ),
+          Expanded(
+            child: _getPageContent(_selectedPage),
+          ),
+        ],
       ),
-      body: _getPageContent(_selectedPage),
     );
   }
 }
