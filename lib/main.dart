@@ -25,11 +25,19 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -97,16 +105,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
 
 class _HomePageState extends State<HomePage> {
   String _selectedPage = "首頁";
   bool _isExpanded = false;
+  Map<String, bool> _menuExpansionState = {};
 
   final Map<String, List<String>> menuItems = {
     "系統管理": ["個人中心", "他人帳號", "企業組織管理", "組織權限分配", "資產管理", "公告管理", "系統日誌"],
@@ -115,24 +118,21 @@ class _HomePageState extends State<HomePage> {
     "財務管理": ["月結帳單管理", "成本核算", "其他進項管理"]
   };
 
-  // 連結到個人中心頁面
-  Widget _getPageContent(String page) {
-     if (page == "個人中心") {
-      return UserProfile(userId: 'uuid',);
-    } else if (page == "企業組織管理") {
-      return MaterialApp(
-      title: '企業組織管理',
-      home: OrganizationView(),
-    );
+  @override
+  void initState() {
+    super.initState();
+    for (var key in menuItems.keys) {
+      _menuExpansionState[key] = false;
     }
-    return Center(child: Text('這是 $page 頁面', style: const TextStyle(fontSize: 20)));
   }
 
-  void _logout() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
-    );
+  Widget _getPageContent(String page) {
+    if (page == "個人中心") {
+      return UserProfile(userId: 'uuid');
+    } else if (page == "企業組織管理") {
+      return OrganizationView();
+    }
+    return Center(child: Text('這是 $page 頁面', style: const TextStyle(fontSize: 20)));
   }
 
   @override
@@ -161,20 +161,29 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   for (var category in menuItems.keys) ...[
                     ListTile(
-                      leading: Icon(Icons.category),
+                      leading: Icon(Icons.folder),
                       title: _isExpanded ? Text(category, style: const TextStyle(fontWeight: FontWeight.bold)) : null,
+                      trailing: _isExpanded
+                          ? Icon(_menuExpansionState[category]! ? Icons.expand_less : Icons.expand_more)
+                          : null,
+                      onTap: () {
+                        setState(() {
+                          _menuExpansionState[category] = !_menuExpansionState[category]!;
+                        });
+                      },
                     ),
-                    for (var item in menuItems[category]!)
-                      ListTile(
-                        leading: Icon(Icons.label),
-                        title: _isExpanded ? Text(item) : null,
-                        onTap: () {
-                          setState(() {
-                            _selectedPage = item;
-                          });
-                          Navigator.pop(context);
-                        },
-                      ),
+                    if (_menuExpansionState[category]!)
+                      for (var item in menuItems[category]!)
+                        ListTile(
+                          leading: Icon(Icons.label),
+                          title: _isExpanded ? Text(item) : null,
+                          onTap: () {
+                            setState(() {
+                              _selectedPage = item;
+                            });
+                            Navigator.pop(context);
+                          },
+                        ),
                   ]
                 ],
               ),
